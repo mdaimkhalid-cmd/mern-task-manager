@@ -220,38 +220,46 @@ function App() { const [taskTitle, setTaskTitle] = useState("");
                 </p>
             ) : (
                 <div className="task-list">
-                    {filteredTasks.map((task) => (
-                        <div className="task" key={task._id}>
-                            <div>
-                                <input
-                                    type="checkbox"
-                                    checked={task.completed}
-                                    onChange={() => handleToggleComplete(task)}
-                                />
+    {filteredTasks.length === 0 ? (
+        <p className="empty-message">
+            {filter === "all" && "No tasks yet. Add your first task!"}
+            {filter === "pending" && "No pending tasks."}
+            {filter === "completed" && "No completed tasks."}
+        </p>
+    ) : (
+        filteredTasks.map((task) => (
+            <div className="task" key={task._id}>
+                <div>
+                    <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => handleToggleComplete(task)}
+                    />
 
-                                <span className={task.completed ? "completed" : ""}>
-                                    {task.title}
-                                </span>
-                            </div>
-
-                            <div>
-                                <button
-                                    className="edit-button"
-                                    onClick={() => handleEditTask(task)}
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    className="delete-button"
-                                    onClick={() => handleDeleteTask(task._id)}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                    <span className={task.completed ? "completed" : ""}>
+                        {task.title}
+                    </span>
                 </div>
+
+                <div>
+                    <button
+                        className="edit-button"
+                        onClick={() => handleEditTask(task)}
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        className="delete-button"
+                        onClick={() => handleDeleteTask(task._id)}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        ))
+    )}
+</div>
             )}
         </div>
     );

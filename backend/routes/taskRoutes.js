@@ -64,13 +64,26 @@ router.get("/:id", async (req, res) => {
 // Update a task
 router.put("/:id", async (req, res) => {
     try {
+        if (req.body.title !== undefined && req.body.title.trim() === "") {
+            return res.status(400).json({
+                message: "Task title cannot be empty"
+            });
+        }
+
         const updatedTask = await Task.findByIdAndUpdate(
             req.params.id,
             {
-                title: req.body.title,
-                completed: req.body.completed
+                ...(req.body.title !== undefined && {
+                    title: req.body.title.trim()
+                }),
+                ...(req.body.completed !== undefined && {
+                    completed: req.body.completed
+                })
             },
-            { new: true }
+            {
+                new: true,
+                runValidators: true
+            }
         );
 
         if (!updatedTask) {
