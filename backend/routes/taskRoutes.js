@@ -6,8 +6,14 @@ const router = express.Router();
 // Create a new task
 router.post("/", async (req, res) => {
     try {
+        if (!req.body.title || req.body.title.trim() === "") {
+            return res.status(400).json({
+                message: "Task title is required"
+            });
+        }
+
         const task = new Task({
-            title: req.body.title
+            title: req.body.title.trim()
         });
 
         const savedTask = await task.save();
