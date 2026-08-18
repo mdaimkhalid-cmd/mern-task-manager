@@ -1,38 +1,37 @@
 /* =========================================================
    MERN TASK MANAGER
-   Cream + Brown Professional Theme
+   Cream + Brown Professional UI
    ========================================================= */
 
 :root {
-    --cream: #f8f3ea;
-    --cream-light: #fffdf8;
-    --cream-dark: #eee4d3;
+    --cream-bg: #f8f3eb;
+    --cream-light: #fffdf9;
+    --cream-card: #fffefa;
 
-    --brown: #6f4e37;
-    --brown-dark: #4e3426;
-    --brown-light: #8b6b52;
+    --brown-dark: #4f3021;
+    --brown: #765038;
+    --brown-light: #8b6549;
+    --brown-soft: #eee3d4;
 
-    --gold: #b58b5a;
+    --text-dark: #3f3027;
+    --text-medium: #765f4e;
+    --text-light: #a18c7a;
 
-    --text-primary: #3e2c20;
-    --text-secondary: #725f50;
-    --text-muted: #a18d7b;
+    --border: #e2d2bf;
 
-    --border: #dfd1bf;
+    --green: #56805a;
+    --green-light: #e6f0e5;
 
-    --success: #557a55;
-    --success-light: #e4eee2;
+    --red: #b64a3f;
+    --red-light: #f7e4e1;
 
-    --danger: #a94a42;
-    --danger-light: #f6e4e1;
+    --shadow-sm: 0 4px 12px rgba(78, 48, 33, 0.07);
+    --shadow-md: 0 8px 24px rgba(78, 48, 33, 0.10);
+    --shadow-lg: 0 15px 40px rgba(78, 48, 33, 0.13);
 
-    --shadow-sm: 0 2px 8px rgba(78, 52, 38, 0.08);
-    --shadow-md: 0 8px 22px rgba(78, 52, 38, 0.12);
-    --shadow-lg: 0 15px 35px rgba(78, 52, 38, 0.15);
-
-    --radius-sm: 7px;
-    --radius-md: 11px;
-    --radius-lg: 15px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
 }
 
 
@@ -52,9 +51,9 @@ body {
         Arial,
         sans-serif;
 
-    background: var(--cream);
+    background: var(--cream-bg);
 
-    color: var(--text-primary);
+    color: var(--text-dark);
 
     min-height: 100vh;
 }
@@ -65,208 +64,187 @@ body {
    ========================================================= */
 
 .app {
-    width: min(92%, 1000px);
+    width: min(92%, 1280px);
 
     margin: 0 auto;
 
-    padding: 55px 0 70px;
+    padding: 42px 0 80px;
 
-    animation: pageEnter 0.6s ease-out;
+    animation: pageEnter 0.5s ease-out;
 }
 
 
 /* =========================================================
-   HEADING
+   HEADER
    ========================================================= */
 
-h1 {
-    text-align: center;
+.user-header {
+    display: flex;
 
-    margin: 0 0 38px;
+    justify-content: space-between;
+    align-items: flex-start;
 
-    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    gap: 30px;
+
+    margin-bottom: 45px;
+}
+
+
+/* Left side of header */
+
+.user-header > div:first-child {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 8px;
+}
+
+
+/* Main title */
+
+.user-header h1 {
+    margin: 0;
+
+    padding: 0;
+
+    text-align: left;
+
+    font-size: clamp(2.5rem, 5vw, 4.4rem);
+
+    line-height: 0.95;
 
     font-weight: 800;
 
-    letter-spacing: -1px;
+    letter-spacing: -2px;
 
     color: var(--brown-dark);
+
+    background: none;
+
+    -webkit-background-clip: initial;
+    background-clip: initial;
+
+    -webkit-text-fill-color: initial;
 
     animation: titleEnter 0.6s ease-out;
 }
 
 
-/* =========================================================
-   TASK INPUT
-   ========================================================= */
+/* Welcome badge */
 
-.task-input {
-    display: flex;
+.welcome-message {
+    display: inline-block;
 
-    gap: 10px;
+    margin: 0;
 
-    margin-bottom: 28px;
+    padding: 6px 14px;
 
-    padding: 8px;
+    border-radius: 20px;
 
-    background: var(--cream-light);
+    background: #f1e6d7;
 
-    border: 1px solid var(--border);
+    border: 1px solid #e4d2bd;
 
-    border-radius: var(--radius-md);
-
-    box-shadow: var(--shadow-md);
-
-    transition:
-        border-color 0.25s ease,
-        box-shadow 0.25s ease,
-        transform 0.25s ease;
-}
-
-.task-input:focus-within {
-    border-color: var(--brown-light);
-
-    box-shadow:
-        0 0 0 3px rgba(111, 78, 55, 0.1),
-        var(--shadow-md);
-
-    transform: translateY(-2px);
-}
-
-.task-input input {
-    flex: 1;
-
-    min-width: 0;
-
-    padding: 13px 15px;
-
-    border: none;
-
-    outline: none;
-
-    background: transparent;
-
-    color: var(--text-primary);
-
-    font-size: 15px;
-}
-
-.task-input input::placeholder {
-    color: var(--text-muted);
-}
-
-
-/* =========================================================
-   ADD / UPDATE BUTTON
-   ========================================================= */
-
-.task-input button {
-    padding: 12px 20px;
-
-    border: none;
-
-    border-radius: 9px;
-
-    cursor: pointer;
-
-    background: var(--brown);
-
-    color: white;
+    color: var(--brown);
 
     font-size: 14px;
 
     font-weight: 600;
 
-    box-shadow: 0 5px 12px rgba(111, 78, 55, 0.2);
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.task-input button:hover {
-    background: var(--brown-dark);
-
-    transform: translateY(-2px);
-
-    box-shadow: 0 8px 18px rgba(111, 78, 55, 0.28);
-}
-
-.task-input button:active {
-    transform: scale(0.96);
+    line-height: 1.4;
 }
 
 
 /* =========================================================
-   CANCEL BUTTON
+   LOGOUT
    ========================================================= */
 
-.cancel-button {
-    padding: 12px 18px;
+.logout-button {
+    flex-shrink: 0;
 
-    border: 1px solid var(--border);
+    margin-top: 8px;
+
+    padding: 11px 21px;
+
+    border: 1px solid #caa98d;
 
     border-radius: 9px;
 
     cursor: pointer;
 
-    background: var(--cream-dark);
+    background: var(--cream-light);
 
     color: var(--brown-dark);
 
     font-size: 14px;
 
-    font-weight: 600;
+    font-weight: 700;
 
     transition:
+        transform 0.2s ease,
         background 0.2s ease,
-        transform 0.2s ease;
+        color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.cancel-button:hover {
-    background: #e5d8c5;
+.logout-button:hover {
+    background: var(--brown);
+
+    color: white;
 
     transform: translateY(-2px);
+
+    box-shadow: var(--shadow-sm);
 }
 
-.cancel-button:active {
+.logout-button:active {
     transform: scale(0.96);
 }
 
 
 /* =========================================================
-   TASK STATISTICS
+   STATISTICS
    ========================================================= */
 
 .task-stats {
     display: flex;
 
-    justify-content: space-between;
+    gap: 18px;
 
-    gap: 14px;
-
-    margin-bottom: 25px;
+    margin-bottom: 34px;
 }
 
 .task-stats span {
+    position: relative;
+
     flex: 1;
 
-    padding: 18px 15px;
+    min-height: 75px;
 
-    background: var(--cream-light);
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: var(--cream-card);
 
     border: 1px solid var(--border);
 
     border-radius: var(--radius-lg);
 
-    text-align: center;
+    color: var(--brown);
 
-    font-size: 14px;
+    font-size: 17px;
 
     font-weight: 600;
-
-    color: var(--text-secondary);
 
     box-shadow: var(--shadow-sm);
 
@@ -289,37 +267,35 @@ h1 {
 .filters {
     display: flex;
 
-    gap: 6px;
-
     width: fit-content;
 
-    margin-bottom: 25px;
+    gap: 3px;
 
-    padding: 5px;
+    margin-bottom: 30px;
 
-    background: var(--cream-dark);
+    padding: 6px;
 
-    border-radius: 10px;
+    background: #eee3d3;
+
+    border-radius: 12px;
 }
 
 .filters button {
-    flex: 1;
-
-    padding: 10px 18px;
+    padding: 12px 23px;
 
     border: none;
+
+    border-radius: 9px;
 
     background: transparent;
 
     color: var(--brown-light);
 
-    border-radius: 8px;
-
     cursor: pointer;
 
-    font-size: 14px;
+    font-size: 15px;
 
-    font-weight: 600;
+    font-weight: 650;
 
     transition:
         background 0.2s ease,
@@ -328,13 +304,13 @@ h1 {
 }
 
 .filters button:hover {
-    background: var(--cream-light);
+    background: rgba(255, 255, 255, 0.55);
 
     color: var(--brown-dark);
 }
 
 .filters button:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 .filters button.active-filter {
@@ -342,7 +318,149 @@ h1 {
 
     color: white;
 
-    box-shadow: 0 4px 10px rgba(111, 78, 55, 0.22);
+    box-shadow:
+        0 4px 10px rgba(76, 48, 33, 0.18);
+}
+
+
+/* =========================================================
+   TASK INPUT
+   ========================================================= */
+
+.task-input {
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 36px;
+
+    padding: 10px;
+
+    background: var(--cream-card);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    box-shadow: var(--shadow-md);
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+.task-input:focus-within {
+    border-color: #c4a586;
+
+    box-shadow:
+        0 0 0 4px rgba(139, 101, 73, 0.08),
+        var(--shadow-md);
+
+    transform: translateY(-2px);
+}
+
+.task-input input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 14px 18px;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: var(--text-dark);
+
+    font-size: 16px;
+}
+
+.task-input input::placeholder {
+    color: #aa9684;
+}
+
+
+/* =========================================================
+   ADD / UPDATE BUTTON
+   ========================================================= */
+
+.task-input button {
+    padding: 13px 25px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: var(--brown);
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 5px 12px rgba(111, 74, 50, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.task-input button:hover {
+    background: var(--brown-dark);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(111, 74, 50, 0.27);
+}
+
+.task-input button:active {
+    transform: scale(0.96);
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+   ========================================================= */
+
+.cancel-button {
+    padding: 13px 20px;
+
+    border: 1px solid #d2c0ad;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: #f4ece3;
+
+    color: var(--brown);
+
+    font-size: 14px;
+
+    font-weight: 650;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.cancel-button:hover {
+    background: #e8dacb;
+
+    transform: translateY(-2px);
+}
+
+.cancel-button:active {
+    transform: scale(0.96);
 }
 
 
@@ -351,17 +469,46 @@ h1 {
    ========================================================= */
 
 .task-list-title {
-    margin: 5px 0 14px;
+    display: flex;
 
-    font-size: 19px;
+    justify-content: center;
 
-    font-weight: 700;
+    align-items: center;
+
+    gap: 6px;
+
+    margin: 0 0 18px;
+
+    font-size: 24px;
+
+    font-weight: 750;
 
     color: var(--brown-dark);
+
+    text-align: center;
+}
+
+.task-list-title::before,
+.task-list-title::after {
+    content: "";
+
+    height: 1px;
+
+    flex: 1;
+
+    background: #dcc9b4;
+}
+
+.task-list-title::before {
+    margin-right: 20px;
+}
+
+.task-list-title::after {
+    margin-left: 20px;
 }
 
 .task-list-title span {
-    color: var(--text-muted);
+    color: #a18c7a;
 
     font-weight: 500;
 }
@@ -376,7 +523,7 @@ h1 {
 
     flex-direction: column;
 
-    gap: 12px;
+    gap: 13px;
 }
 
 
@@ -393,17 +540,15 @@ h1 {
 
     gap: 20px;
 
-    padding: 17px 19px;
+    padding: 20px 22px;
 
-    background: var(--cream-light);
+    background: var(--cream-card);
 
     border: 1px solid var(--border);
 
-    border-radius: var(--radius-md);
+    border-radius: 14px;
 
     box-shadow: var(--shadow-sm);
-
-    animation: taskEnter 0.4s ease both;
 
     transition:
         transform 0.25s ease,
@@ -414,7 +559,7 @@ h1 {
 .task:hover {
     transform: translateY(-3px);
 
-    border-color: #c7b39d;
+    border-color: #cfb89f;
 
     box-shadow: var(--shadow-md);
 }
@@ -429,27 +574,23 @@ h1 {
 
     align-items: center;
 
-    gap: 12px;
+    gap: 14px;
 
     min-width: 0;
 }
 
 .task span {
-    color: var(--text-primary);
+    color: var(--text-dark);
 
-    font-size: 15px;
+    font-size: 16px;
 
-    font-weight: 550;
+    font-weight: 600;
 
     overflow: hidden;
 
     text-overflow: ellipsis;
 
     white-space: nowrap;
-
-    transition:
-        color 0.2s ease,
-        opacity 0.2s ease;
 }
 
 
@@ -462,9 +603,9 @@ h1 {
 
     text-decoration-thickness: 2px;
 
-    color: var(--text-muted) !important;
+    color: #ad9f93 !important;
 
-    opacity: 0.65;
+    opacity: 0.75;
 }
 
 
@@ -475,71 +616,88 @@ h1 {
 .task input[type="checkbox"] {
     appearance: none;
 
-    width: 20px;
-
-    height: 20px;
+    width: 26px;
+    height: 26px;
 
     flex-shrink: 0;
 
-    margin-right: 2px;
+    margin: 0;
 
-    border: 2px solid #c8b8a6;
+    border: 2px solid #b9a38d;
 
-    border-radius: 6px;
+    border-radius: 7px;
 
-    background: var(--cream-light);
+    background: #fffaf4;
 
     cursor: pointer;
 
+    position: relative;
+
     transition:
-        border-color 0.2s ease,
         background 0.2s ease,
+        border-color 0.2s ease,
         transform 0.2s ease;
 }
 
 .task input[type="checkbox"]:hover {
-    border-color: var(--brown);
+    border-color: var(--green);
 
-    transform: scale(1.08);
+    transform: scale(1.05);
 }
 
 .task input[type="checkbox"]:checked {
-    border-color: var(--success);
+    border-color: var(--green);
 
-    background: var(--success);
+    background: var(--green);
 
-    transform: scale(1.05);
+    transform: scale(1.03);
+}
 
-    position: relative;
+.task input[type="checkbox"]:checked::after {
+    content: "";
+
+    position: absolute;
+
+    left: 7px;
+    top: 3px;
+
+    width: 7px;
+    height: 13px;
+
+    border: solid white;
+
+    border-width: 0 2px 2px 0;
+
+    transform: rotate(45deg);
 }
 
 
 /* =========================================================
-   TASK ACTION BUTTONS
+   TASK ACTIONS
    ========================================================= */
 
 .task > div:last-child {
     display: flex;
 
-    gap: 7px;
+    gap: 9px;
 
     flex-shrink: 0;
 }
 
 .task button {
-    margin-left: 0;
+    margin: 0;
 
-    padding: 8px 13px;
+    padding: 9px 17px;
 
     border: none;
 
-    border-radius: 8px;
+    border-radius: 9px;
 
     cursor: pointer;
 
-    font-size: 13px;
+    font-size: 14px;
 
-    font-weight: 600;
+    font-weight: 650;
 
     transition:
         transform 0.2s ease,
@@ -552,62 +710,62 @@ h1 {
 }
 
 .task button:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
 }
 
 
 /* =========================================================
-   EDIT BUTTON
+   EDIT
    ========================================================= */
 
 .edit-button {
-    background: #eadfd3;
+    background: #eee4d8;
 
     color: var(--brown);
 }
 
 .edit-button:hover {
-    background: #dccbbb;
+    background: #e4d5c5;
 
     box-shadow:
-        0 4px 10px rgba(111, 78, 55, 0.12);
+        0 4px 10px rgba(111, 74, 50, 0.10);
 }
 
 
 /* =========================================================
-   DELETE BUTTON
+   DELETE
    ========================================================= */
 
 .delete-button {
-    background: var(--danger-light);
+    background: var(--red-light);
 
-    color: var(--danger);
+    color: var(--red);
 }
 
 .delete-button:hover {
-    background: #efd0cb;
+    background: #f1d4d0;
 
     box-shadow:
-        0 4px 10px rgba(169, 74, 66, 0.12);
+        0 4px 10px rgba(182, 74, 63, 0.12);
 }
 
 
 /* =========================================================
-   ERROR MESSAGE
+   ERROR
    ========================================================= */
 
 .error {
-    color: var(--danger);
-
     margin: 8px 0 18px;
 
     padding: 12px 15px;
 
-    background: var(--danger-light);
-
-    border: 1px solid #e9c4bf;
+    border: 1px solid #e1bcb5;
 
     border-radius: 9px;
+
+    background: #fff1ef;
+
+    color: #a63c31;
 
     font-size: 14px;
 
@@ -620,11 +778,11 @@ h1 {
    ========================================================= */
 
 .loading {
+    padding: 30px;
+
     text-align: center;
 
-    color: var(--text-secondary);
-
-    padding: 30px;
+    color: var(--text-light);
 
     font-size: 14px;
 
@@ -637,21 +795,313 @@ h1 {
    ========================================================= */
 
 .empty-message {
+    padding: 45px 25px;
+
     text-align: center;
 
-    padding: 40px 25px;
+    color: var(--text-medium);
 
-    color: var(--text-secondary);
+    background: rgba(255, 253, 249, 0.75);
 
-    background: var(--cream-light);
+    border: 1px dashed #d3bfaa;
 
-    border: 1px dashed #cdbda9;
-
-    border-radius: var(--radius-md);
+    border-radius: 14px;
 
     font-size: 15px;
 
     animation: fadeIn 0.4s ease;
+}
+
+
+/* =========================================================
+   AUTHENTICATION
+   ========================================================= */
+
+.auth-container {
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 30px 20px;
+
+    box-sizing: border-box;
+
+    background: var(--cream-bg);
+
+    animation: authFadeIn 0.5s ease-out;
+}
+
+.auth-card {
+    width: min(100%, 430px);
+
+    padding: 42px 38px;
+
+    box-sizing: border-box;
+
+    background: var(--cream-card);
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow-lg);
+
+    animation: authCardEnter 0.6s ease-out;
+}
+
+.auth-card h1 {
+    margin: 0 0 8px;
+
+    text-align: center;
+
+    font-size: 34px;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    color: var(--brown-dark);
+
+    background: none;
+
+    -webkit-text-fill-color: initial;
+}
+
+.auth-subtitle {
+    margin: 0 0 30px;
+
+    text-align: center;
+
+    color: var(--text-medium);
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   AUTH INPUTS
+   ========================================================= */
+
+.auth-field {
+    margin-bottom: 18px;
+}
+
+.auth-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--brown-dark);
+
+    font-size: 14px;
+
+    font-weight: 650;
+}
+
+.auth-field input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d7c5b2;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #fffaf4;
+
+    color: var(--text-dark);
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+.auth-field input:focus {
+    border-color: var(--brown-light);
+
+    background: white;
+
+    box-shadow:
+        0 0 0 4px rgba(139, 101, 73, 0.10);
+}
+
+
+/* =========================================================
+   AUTH BUTTON
+   ========================================================= */
+
+.auth-button {
+    width: 100%;
+
+    margin-top: 8px;
+
+    padding: 13px 18px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    background: var(--brown);
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.auth-button:hover {
+    background: var(--brown-dark);
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* =========================================================
+   AUTH SWITCH
+   ========================================================= */
+
+.auth-switch {
+    margin-top: 22px;
+
+    text-align: center;
+
+    color: var(--text-medium);
+
+    font-size: 14px;
+}
+
+.auth-switch button {
+    margin-left: 5px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--brown);
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.auth-switch button:hover {
+    color: var(--brown-dark);
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   GUEST
+   ========================================================= */
+
+.guest-option {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 22px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #e5d7c8;
+}
+
+.guest-option span {
+    color: var(--text-light);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.guest-option button {
+    width: 100%;
+
+    padding: 12px 18px;
+
+    border: 1px solid #9b7658;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    background: transparent;
+
+    color: var(--brown);
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.2s ease;
+}
+
+.guest-option button:hover {
+    background: var(--brown);
+
+    color: white;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   AUTH ERROR
+   ========================================================= */
+
+.auth-error {
+    margin: 8px 0 15px;
+
+    padding: 11px 13px;
+
+    border: 1px solid #e1bcb5;
+
+    border-radius: 8px;
+
+    background: #fff1ef;
+
+    color: #a63c31;
+
+    font-size: 13px;
+
+    animation: shake 0.35s ease;
 }
 
 
@@ -662,11 +1112,13 @@ h1 {
 @keyframes pageEnter {
     from {
         opacity: 0;
-        transform: translateY(18px);
+
+        transform: translateY(15px);
     }
 
     to {
         opacity: 1;
+
         transform: translateY(0);
     }
 }
@@ -674,23 +1126,13 @@ h1 {
 @keyframes titleEnter {
     from {
         opacity: 0;
-        transform: translateY(-15px);
+
+        transform: translateY(-12px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes taskEnter {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
         transform: translateY(0);
     }
 }
@@ -731,56 +1173,72 @@ h1 {
     }
 }
 
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes authCardEnter {
+    from {
+        opacity: 0;
+
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+
+        transform: translateY(0) scale(1);
+    }
+}
+
 
 /* =========================================================
-   RESPONSIVE DESIGN
+   RESPONSIVE
    ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .app {
         width: 92%;
 
-        margin: 0 auto;
-
-        padding: 30px 0 50px;
+        padding: 30px 0 55px;
     }
 
-    h1 {
-        font-size: 2.2rem;
-
-        margin-bottom: 28px;
+    .user-header {
+        margin-bottom: 35px;
     }
 
-    .task-input {
+    .user-header h1 {
+        font-size: 2.7rem;
+    }
+
+    .task-stats {
         flex-direction: column;
 
-        padding: 10px;
+        gap: 10px;
     }
 
-    .task-input input {
+    .filters {
         width: 100%;
-
-        padding: 13px 10px;
     }
 
-    .task-input button {
-        width: 100%;
+    .filters button {
+        flex: 1;
 
-        min-height: 44px;
-    }
-
-    .cancel-button {
-        width: 100%;
-
-        min-height: 44px;
+        padding: 11px 8px;
     }
 
     .task {
         align-items: flex-start;
 
-        gap: 15px;
-
         flex-direction: column;
+
+        gap: 15px;
     }
 
     .task > div:last-child {
@@ -789,8 +1247,6 @@ h1 {
 
     .task button {
         flex: 1;
-
-        margin-left: 0;
     }
 
     .task span {
@@ -798,47 +1254,50 @@ h1 {
 
         line-height: 1.4;
     }
-
-    .task-stats {
-        flex-direction: column;
-
-        gap: 9px;
-    }
-
-    .task-stats span {
-        padding: 16px;
-    }
-
-    .filters {
-        width: 100%;
-
-        gap: 4px;
-    }
-
-    .filters button {
-        padding: 10px 8px;
-
-        font-size: 13px;
-    }
 }
 
 
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
+@media (max-width: 500px) {
+    .user-header {
+        align-items: flex-start;
 
-@media (max-width: 380px) {
-    h1 {
-        font-size: 1.9rem;
+        gap: 15px;
     }
 
-    .task {
-        padding: 14px;
+    .user-header h1 {
+        font-size: 2.2rem;
     }
 
-    .task button {
+    .welcome-message {
         font-size: 12px;
+    }
 
-        padding: 8px;
+    .logout-button {
+        padding: 9px 13px;
+
+        font-size: 12px;
+    }
+
+    .task-input {
+        flex-direction: column;
+
+        padding: 9px;
+    }
+
+    .task-input button {
+        width: 100%;
+    }
+
+    .task-list-title {
+        font-size: 20px;
+    }
+
+    .task-list-title::before,
+    .task-list-title::after {
+        display: none;
+    }
+
+    .auth-card {
+        padding: 32px 24px;
     }
 }

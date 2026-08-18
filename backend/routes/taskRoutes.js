@@ -1,10 +1,11 @@
 const express = require("express");
 const Task = require("../models/Task");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // Create a new task
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
     try {
         if (!req.body.title || req.body.title.trim() === "") {
             return res.status(400).json({
@@ -13,7 +14,8 @@ router.post("/", async (req, res) => {
         }
 
         const task = new Task({
-            title: req.body.title.trim()
+            title: req.body.title.trim(),
+            user: req.userId
         });
 
         const savedTask = await task.save();
@@ -27,10 +29,12 @@ router.post("/", async (req, res) => {
     }
 });
 
-// Get all tasks
-router.get("/", async (req, res) => {
+// Get all tasks for the logged-in user
+router.get("/", authMiddleware, async (req, res) => {
     try {
-        const tasks = await Task.find();
+        const tasks = await Task.find({
+            user: req.userId
+        });
 
         res.status(200).json(tasks);
     } catch (error) {
@@ -42,9 +46,12 @@ router.get("/", async (req, res) => {
 });
 
 // Get one task by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id);
+        const task = await Task.findOne({
+            _id: req.params.id,
+            user: req.userId
+        });
 
         if (!task) {
             return res.status(404).json({
@@ -62,7 +69,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a task
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
     try {
         if (req.body.title !== undefined && req.body.title.trim() === "") {
             return res.status(400).json({
@@ -70,8 +77,11 @@ router.put("/:id", async (req, res) => {
             });
         }
 
-        const updatedTask = await Task.findByIdAndUpdate(
-            req.params.id,
+        const updatedTask = await Task.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                user: req.userId
+            },
             {
                 ...(req.body.title !== undefined && {
                     title: req.body.title.trim()
@@ -102,9 +112,12 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a task
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
     try {
-        const deletedTask = await Task.findByIdAndDelete(req.params.id);
+        const deletedTask = await Task.findOneAndDelete({
+            _id: req.params.id,
+            user: req.userId
+        });
 
         if (!deletedTask) {
             return res.status(404).json({
@@ -123,4 +136,5 @@ router.delete("/:id", async (req, res) => {
         });
     }
 });
+
 module.exports = router;

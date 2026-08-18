@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
+import Auth from "./Auth";
 
-function App() { const [taskTitle, setTaskTitle] = useState("");
+function App() { const [token, setToken] = useState(
+                            localStorage.getItem("token")
+                        );
+
+                        const [user, setUser] = useState(
+                            JSON.parse(localStorage.getItem("user")) || null
+                        );
+
+                        const [isGuest, setIsGuest] = useState(
+                            localStorage.getItem("isGuest") === "true"
+                        );
+                 const [taskTitle, setTaskTitle] = useState("");
                  const [tasks, setTasks] = useState([]);
                  const [editingTaskId, setEditingTaskId] = useState(null);
                  const [error, setError] = useState("");
@@ -10,21 +22,72 @@ function App() { const [taskTitle, setTaskTitle] = useState("");
                  const [loading, setLoading] = useState(true);
 
                  const API_URL = import.meta.env.VITE_API_URL;
+                 const handleLogin = (newToken, newUser, guest = false) => {
+                        localStorage.setItem("user", JSON.stringify(newUser));
+
+                        if (guest) {
+                            localStorage.removeItem("token");
+                            localStorage.setItem("isGuest", "true");
+                        } else {
+                            localStorage.setItem("token", newToken);
+                            localStorage.removeItem("isGuest");
+                        }
+
+                        setTasks([]);
+                        setError("");
+
+                        setToken(newToken);
+                        setUser(newUser);
+                        setIsGuest(guest);
+                    };
+
+                    const handleLogout = () => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user");
+                        localStorage.removeItem("isGuest");
+
+                        setTasks([]);
+                        setError("");
+
+                        setToken(null);
+                        setUser(null);
+                        setIsGuest(false);
+                    };
                  useEffect(() => {
                     const fetchTasks = async () => {
+
+                        // Guest mode
+                        if (isGuest) {
+                            const guestTasks = JSON.parse(
+                                localStorage.getItem("guestTasks")
+                            ) || [];
+
+                            setTasks(guestTasks);
+                            setLoading(false);
+                            return;
+                        }
+
+                        // Registered user
                         try {
-                            const response = await axios.get(API_URL);
+                            const response = await axios.get(API_URL, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            });
+
                             setTasks(response.data);
                         } catch (error) {
                             console.error("Failed to fetch tasks:", error);
-                            setError("Failed to load tasks. Please make sure the server is running.");
+                            setError(
+                                "Failed to load tasks. Please make sure the server is running."
+                            );
                         } finally {
                             setLoading(false);
                         }
                     };
 
                     fetchTasks();
-                }, []);
+                }, [token, isGuest]);
 
                 const filteredTasks = tasks.filter((task) => {
                     if (filter === "completed") {
@@ -39,65 +102,148 @@ function App() { const [taskTitle, setTaskTitle] = useState("");
                 });
 
                   const handleAddTask = async () => {
-                      if (taskTitle.trim() === "") {
-                          setError("Please enter a task.");
-                          return;
-                      }
+                    if (taskTitle.trim() === "") {
+                        setError("Please enter a task.");
+                        return;
+                    }
 
-                      setError("");
+                    setError("");
 
-                      try {
-                          const response = await axios.post(API_URL, {
-                              title: taskTitle
-                          });
+                    // Guest mode
+                    if (isGuest) {
+                        const newTask = {
+                            _id: Date.now().toString(),
+                            title: taskTitle.trim(),
+                            completed: false,
+                            createdAt: new Date().toISOString()
+                        };
 
-                          setTasks([...tasks, response.data]);
-                          setTaskTitle("");
-                      } 
-                      catch (error) {
-                              console.error("Failed to add task:", error);
-                              setError("Failed to add task. Please make sure the server is running.");
-                          }
-                  };
-                  const handleDeleteTask = async (taskId) => {
-                      const confirmed = window.confirm(
-                          "Are you sure you want to delete this task?"
-                      );
+                        const updatedTasks = [...tasks, newTask];
 
-                      if (!confirmed) {
-                          return;
-                      }
+                        localStorage.setItem(
+                            "guestTasks",
+                            JSON.stringify(updatedTasks)
+                        );
 
-                      try {
-                          await axios.delete(`${API_URL}/${taskId}`);
+                        setTasks(updatedTasks);
+                        setTaskTitle("");
 
-                          setTasks(tasks.filter((task) => task._id !== taskId));
-                      } 
-                      catch (error) {
-                              console.error("Failed to delete task:", error);
-                              setError("Failed to delete task. Please try again.");
-                          }
-                  };
-                  const handleToggleComplete = async (task) => {
-                      try {
-                          const response = await axios.put(`${API_URL}/${task._id}`, {
-                              title: task.title,
-                              completed: !task.completed
-                          });
+                        return;
+                    }
 
-                          setTasks(
-                              tasks.map((currentTask) =>
-                                  currentTask._id === task._id
-                                      ? response.data
-                                      : currentTask
-                              )
-                          );
-                      } 
-                      catch (error) {
-                                console.error("Failed to update task:", error);
-                                setError("Failed to update task. Please try again.");
+                    // Registered user mode
+                    try {
+                        const response = await axios.post(
+                            API_URL,
+                            {
+                                title: taskTitle
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
                             }
-                  };
+                        );
+
+                        setTasks([...tasks, response.data]);
+                        setTaskTitle("");
+                    } catch (error) {
+                        console.error("Failed to add task:", error);
+                        setError(
+                            "Failed to add task. Please make sure the server is running."
+                        );
+                    }
+                };
+                  const handleDeleteTask = async (taskId) => {
+                        const confirmed = window.confirm(
+                            "Are you sure you want to delete this task?"
+                        );
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+                        // Guest mode
+                        if (isGuest) {
+                            const updatedTasks = tasks.filter(
+                                (task) => task._id !== taskId
+                            );
+
+                            localStorage.setItem(
+                                "guestTasks",
+                                JSON.stringify(updatedTasks)
+                            );
+
+                            setTasks(updatedTasks);
+
+                            return;
+                        }
+
+                        // Registered user mode
+                        try {
+                            await axios.delete(`${API_URL}/${taskId}`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            });
+
+                            setTasks(
+                                tasks.filter((task) => task._id !== taskId)
+                            );
+                        } catch (error) {
+                            console.error("Failed to delete task:", error);
+                            setError("Failed to delete task. Please try again.");
+                        }
+                    };
+                  const handleToggleComplete = async (task) => {
+                        // Guest mode
+                        if (isGuest) {
+                            const updatedTasks = tasks.map((currentTask) =>
+                                currentTask._id === task._id
+                                    ? {
+                                        ...currentTask,
+                                        completed: !currentTask.completed
+                                    }
+                                    : currentTask
+                            );
+
+                            localStorage.setItem(
+                                "guestTasks",
+                                JSON.stringify(updatedTasks)
+                            );
+
+                            setTasks(updatedTasks);
+
+                            return;
+                        }
+
+                        // Registered user mode
+                        try {
+                            const response = await axios.put(
+                                `${API_URL}/${task._id}`,
+                                {
+                                    title: task.title,
+                                    completed: !task.completed
+                                },
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                }
+                            );
+
+                            setTasks(
+                                tasks.map((currentTask) =>
+                                    currentTask._id === task._id
+                                        ? response.data
+                                        : currentTask
+                                )
+                            );
+                        } catch (error) {
+                            console.error("Failed to update task:", error);
+                            setError("Failed to update task. Please try again.");
+                        }
+                    };
                   const handleEditTask = (task) => {
                       setTaskTitle(task.title);
                       setEditingTaskId(task._id);
@@ -110,29 +256,84 @@ function App() { const [taskTitle, setTaskTitle] = useState("");
 
                         setError("");
 
-                        try {
-                            const taskId = editingTaskId;
+                        const taskId = editingTaskId;
 
-                            const response = await axios.put(`${API_URL}/${taskId}`, {
-                                title: taskTitle
-                            });
-
+                        // Guest mode
+                        if (isGuest) {
                             const updatedTasks = tasks.map((task) =>
-                                task._id === editingTaskId ? response.data : task
+                                task._id === taskId
+                                    ? {
+                                        ...task,
+                                        title: taskTitle.trim()
+                                    }
+                                    : task
+                            );
+
+                            localStorage.setItem(
+                                "guestTasks",
+                                JSON.stringify(updatedTasks)
                             );
 
                             setTasks(updatedTasks);
                             setTaskTitle("");
                             setEditingTaskId(null);
-                        } 
-                        catch (error) {
-                                  console.error("Failed to update task:", error);
-                                  setError("Failed to update task. Please try again.");
-                              }
+
+                            return;
+                        }
+
+                        // Registered user mode
+                        try {
+                            const response = await axios.put(
+                                `${API_URL}/${taskId}`,
+                                {
+                                    title: taskTitle
+                                },
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                }
+                            );
+
+                            const updatedTasks = tasks.map((task) =>
+                                task._id === taskId
+                                    ? response.data
+                                    : task
+                            );
+
+                            setTasks(updatedTasks);
+                            setTaskTitle("");
+                            setEditingTaskId(null);
+
+                        } catch (error) {
+                            console.error("Failed to update task:", error);
+                            setError("Failed to update task. Please try again.");
+                        }
                     };
+                    if (!token && !isGuest) {
+                        return <Auth onLogin={handleLogin} />;
+                    }
     return (
-        <div className="app">
-            <h1>Task Manager</h1>
+    <div className="app">
+
+        <div className="user-header">
+            <div>
+                <h1>Task Manager</h1>
+
+                {user && (
+                    <p className="welcome-message">
+                        Welcome, {user.name}
+                    </p>
+                )}
+            </div>
+
+            <button
+                className="logout-button"
+                onClick={handleLogout}
+            >
+                Logout
+            </button>
+        </div>
 
             <div className="task-stats">
               <span>Total: {tasks.length}</span>
