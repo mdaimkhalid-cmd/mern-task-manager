@@ -1,18 +1,26 @@
 const express = require("express");
 const Task = require("../models/Task");
 const authMiddleware = require("../middleware/authMiddleware");
+const { body, param } = require("express-validator");
+const validate = require("../middleware/validationMiddleware");
 
 const router = express.Router();
 
 // Create a new task
-router.post("/", authMiddleware, async (req, res) => {
+router.post(
+    "/",
+    authMiddleware,
+    [
+        body("title")
+            .trim()
+            .notEmpty()
+            .withMessage("Task title is required")
+            .isLength({ max: 200 })
+            .withMessage("Task title cannot exceed 200 characters")
+    ],
+    validate,
+    async (req, res) => {
     try {
-        if (!req.body.title || req.body.title.trim() === "") {
-            return res.status(400).json({
-                message: "Task title is required"
-            });
-        }
-
         const task = new Task({
             title: req.body.title.trim(),
             user: req.userId
@@ -46,7 +54,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // Get one task by ID
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res, next) => {
     try {
         const task = await Task.findOne({
             _id: req.params.id,
@@ -60,56 +68,72 @@ router.get("/:id", authMiddleware, async (req, res) => {
         }
 
         res.status(200).json(task);
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to get task",
-            error: error.message
-        });
-    }
+    }   catch (error) {
+            next(error);
+        }
 });
 
 // Update a task
-router.put("/:id", authMiddleware, async (req, res) => {
-    try {
-        if (req.body.title !== undefined && req.body.title.trim() === "") {
-            return res.status(400).json({
-                message: "Task title cannot be empty"
-            });
-        }
+router.put(
+    "/:id",
+    authMiddleware,
+    [
+        param("id")
+            .isMongoId()
+            .withMessage("Invalid task ID"),
 
-        const updatedTask = await Task.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                user: req.userId
-            },
-            {
-                ...(req.body.title !== undefined && {
-                    title: req.body.title.trim()
-                }),
-                ...(req.body.completed !== undefined && {
-                    completed: req.body.completed
-                })
-            },
-            {
-                new: true,
-                runValidators: true
+        body("title")
+            .optional()
+            .trim()
+            .notEmpty()
+            .withMessage("Task title cannot be empty")
+            .isLength({ max: 200 })
+            .withMessage("Task title cannot exceed 200 characters"),
+
+        body("completed")
+            .optional()
+            .isBoolean()
+            .withMessage("Completed must be true or false")
+            .toBoolean()
+    ],
+    validate,
+    async (req, res) => {
+        try {
+            const updatedTask = await Task.findOneAndUpdate(
+                {
+                    _id: req.params.id,
+                    user: req.userId
+                },
+                {
+                    ...(req.body.title !== undefined && {
+                        title: req.body.title
+                    }),
+                    ...(req.body.completed !== undefined && {
+                        completed: req.body.completed
+                    })
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
+
+            if (!updatedTask) {
+                return res.status(404).json({
+                    message: "Task not found"
+                });
             }
-        );
 
-        if (!updatedTask) {
-            return res.status(404).json({
-                message: "Task not found"
+            res.status(200).json(updatedTask);
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Failed to update task",
+                error: error.message
             });
         }
-
-        res.status(200).json(updatedTask);
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to update task",
-            error: error.message
-        });
     }
-});
+);
 
 // Delete a task
 router.delete("/:id", authMiddleware, async (req, res) => {

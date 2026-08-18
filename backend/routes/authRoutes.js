@@ -2,20 +2,36 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const { body } = require("express-validator");
+const validate = require("../middleware/validationMiddleware");
 
 const router = express.Router();
 
 // Register a new user
-router.post("/register", async (req, res) => {
+router.post(
+    "/register",
+    [
+        body("name")
+            .trim()
+            .notEmpty()
+            .withMessage("Name is required")
+            .isLength({ min: 2, max: 50 })
+            .withMessage("Name must be between 2 and 50 characters"),
+
+        body("email")
+            .trim()
+            .isEmail()
+            .withMessage("Please provide a valid email address")
+            .normalizeEmail(),
+
+        body("password")
+            .isLength({ min: 8, max: 128 })
+            .withMessage("Password must be between 8 and 128 characters")
+    ],
+    validate,
+    async (req, res) => {
     try {
         const { name, email, password } = req.body;
-
-        // Check required fields
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                message: "Name, email, and password are required"
-            });
-        }
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -56,7 +72,21 @@ router.post("/register", async (req, res) => {
 });
 
 // Login user
-router.post("/login", async (req, res) => {
+router.post(
+    "/login",
+    [
+        body("email")
+            .trim()
+            .isEmail()
+            .withMessage("Please provide a valid email address")
+            .normalizeEmail(),
+
+        body("password")
+            .notEmpty()
+            .withMessage("Password is required")
+    ],
+    validate,
+    async (req, res) => {
     try {
         const { email, password } = req.body;
 
