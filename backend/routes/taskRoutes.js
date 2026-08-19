@@ -18,6 +18,12 @@ router.post(
             .isLength({ max: 200 })
             .withMessage("Task title cannot exceed 200 characters"),
 
+        body("description")
+            .optional()
+            .trim()
+            .isLength({ max: 2000 })
+            .withMessage("Task details cannot exceed 2000 characters"),
+
         body("priority")
             .optional()
             .isIn(["low", "medium", "high"])
@@ -46,6 +52,7 @@ router.post(
     try {
         const task = new Task({
             title: req.body.title.trim(),
+            description: req.body.description?.trim() || "",
             priority: req.body.priority || "medium",
             dueDate: req.body.dueDate || null,
             user: req.userId
@@ -115,6 +122,12 @@ router.put(
             .isLength({ max: 200 })
             .withMessage("Task title cannot exceed 200 characters"),
 
+        body("description")
+            .optional()
+            .trim()
+            .isLength({ max: 2000 })
+            .withMessage("Task details cannot exceed 2000 characters"),
+
         body("completed")
             .optional()
             .isBoolean()
@@ -155,6 +168,12 @@ router.put(
                 {
                     ...(req.body.title !== undefined && {
                         title: req.body.title
+                    }),
+                    ...(req.body.description !== undefined && {
+                        description: req.body.description
+                    }),
+                    ...(req.body.description !== undefined && {
+                        description: req.body.description
                     }),
                     ...(req.body.completed !== undefined && {
                         completed: req.body.completed

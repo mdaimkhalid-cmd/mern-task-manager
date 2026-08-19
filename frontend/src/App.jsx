@@ -17,8 +17,11 @@ function App() { const [token, setToken] = useState(
                  const [taskTitle, setTaskTitle] = useState("");
                  const [taskPriority, setTaskPriority] = useState("medium");
                  const [taskDueDate, setTaskDueDate] = useState("");
+                 const [taskDescription, setTaskDescription] = useState("");
+                 const [showDetails, setShowDetails] = useState(false);
                  const [tasks, setTasks] = useState([]);
                  const [editingTaskId, setEditingTaskId] = useState(null);
+                 const [detailsOpen, setDetailsOpen] = useState(null);
                  const [error, setError] = useState("");
                  const [filter, setFilter] = useState("all");
                  const [sortBy, setSortBy] = useState("newest");
@@ -151,6 +154,7 @@ function App() { const [token, setToken] = useState(
                         const newTask = {
                             _id: Date.now().toString(),
                             title: taskTitle.trim(),
+                            description: taskDescription.trim(),
                             priority: taskPriority,
                             dueDate: taskDueDate || null,
                             completed: false,
@@ -169,6 +173,8 @@ function App() { const [token, setToken] = useState(
                         setTaskPriority("medium");
                         setTaskDueDate("");
                         setEditingTaskId(null);
+                        setTaskDescription("");
+                        setShowDetails(false);
 
                         return;
                     }
@@ -179,6 +185,7 @@ function App() { const [token, setToken] = useState(
                             API_URL,
                             {
                                 title: taskTitle,
+                                description: taskDescription.trim(),
                                 priority: taskPriority,
                                 dueDate: taskDueDate || null
                             },
@@ -193,6 +200,8 @@ function App() { const [token, setToken] = useState(
                         setTaskTitle("");
                         setTaskPriority("medium");
                         setTaskDueDate("");
+                        setTaskDescription("");
+                        setShowDetails(false);
                     } catch (error) {
                         console.error("Failed to add task:", error);
                         setError(
@@ -322,6 +331,7 @@ function App() { const [token, setToken] = useState(
                     };
                   const handleEditTask = (task) => {
                         setTaskTitle(task.title);
+                        setTaskDescription(task.description || "");
                         setTaskPriority(task.priority || "medium");
                         setTaskDueDate(
                             task.dueDate
@@ -329,6 +339,12 @@ function App() { const [token, setToken] = useState(
                                 : ""
                         );
                         setEditingTaskId(task._id);
+
+                        if (task.description) {
+                            setShowDetails(true);
+                        } else {
+                            setShowDetails(false);
+                        }
                     };
                     const handleUpdateTask = async () => {
                         if (taskTitle.trim() === "") {
@@ -347,6 +363,7 @@ function App() { const [token, setToken] = useState(
                                     ? {
                                         ...task,
                                         title: taskTitle.trim(),
+                                        description: taskDescription.trim(),
                                         priority: taskPriority,
                                         dueDate: taskDueDate || null
                                       }
@@ -362,6 +379,8 @@ function App() { const [token, setToken] = useState(
                             setTaskTitle("");
                             setTaskDueDate("");
                             setEditingTaskId(null);
+                            setTaskDescription("");
+                            setShowDetails(false);
 
                             return;
                         }
@@ -372,6 +391,7 @@ function App() { const [token, setToken] = useState(
                                 `${API_URL}/${taskId}`,
                                 {
                                     title: taskTitle,
+                                    description: taskDescription.trim(),
                                     priority: taskPriority,
                                     dueDate: taskDueDate || null
                                 },
@@ -393,6 +413,8 @@ function App() { const [token, setToken] = useState(
                             setTaskPriority("medium");
                             setTaskDueDate("");
                             setEditingTaskId(null);
+                            setTaskDescription("");
+                            setShowDetails(false);
 
                         } catch (error) {
                             console.error("Failed to update task:", error);
@@ -520,7 +542,23 @@ function App() { const [token, setToken] = useState(
                         }
                     }}
                 />
+                <button
+                    type="button"
+                    className="details-toggle"
+                    onClick={() => setShowDetails(!showDetails)}
+                >
+                    {showDetails ? "▲ Hide Details" : "▼ Add Details"}
+                </button>
 
+                {showDetails && (
+                    <textarea
+                        className="task-description-input"
+                        placeholder="Add task details (optional)..."
+                        value={taskDescription}
+                        onChange={(e) => setTaskDescription(e.target.value)}
+                        maxLength={2000}
+                    />
+                )}
                 <button 
                   onClick={editingTaskId === null ? handleAddTask : handleUpdateTask}
               >
@@ -626,34 +664,58 @@ function App() { const [token, setToken] = useState(
                             </span>
                         </div>
 
-                        {task.dueDate && (
-                            <div
-                                className={
-                                    !task.completed &&
-                                    new Date(task.dueDate) < new Date()
-                                        ? "task-due-date overdue"
-                                        : "task-due-date"
-                                }
-                            >
-                                Due: {task.dueDate.split("T")[0]}
+                        <div className="task-meta-row">
+                            {task.dueDate && (
+                                <div
+                                    className={
+                                        !task.completed &&
+                                        new Date(task.dueDate) < new Date()
+                                            ? "task-due-date overdue"
+                                            : "task-due-date"
+                                    }
+                                >
+                                    Due: {task.dueDate.split("T")[0]}
 
-                                {!task.completed &&
-                                    new Date(task.dueDate) < new Date() && (
-                                        <span className="overdue-label">
-                                            OVERDUE
-                                        </span>
-                                    )}
+                                    {!task.completed &&
+                                        new Date(task.dueDate) < new Date() && (
+                                            <span className="overdue-label">
+                                                OVERDUE
+                                            </span>
+                                        )}
 
-                                {!task.completed &&
-                                    new Date(task.dueDate) >= new Date() &&
-                                    new Date(task.dueDate) <=
-                                        new Date(
-                                            Date.now() + 2 * 24 * 60 * 60 * 1000
-                                        ) && (
-                                        <span className="due-soon-label">
-                                            DUE SOON
-                                        </span>
-                                    )}
+                                    {!task.completed &&
+                                        new Date(task.dueDate) >= new Date() &&
+                                        new Date(task.dueDate) <=
+                                            new Date(
+                                                Date.now() + 2 * 24 * 60 * 60 * 1000
+                                            ) && (
+                                                <span className="due-soon-label">
+                                                    DUE SOON
+                                                </span>
+                                            )}
+                                </div>
+                            )}
+
+                            {task.description && (
+                                <button
+                                    type="button"
+                                    className="task-details-toggle"
+                                    onClick={() =>
+                                        setDetailsOpen(
+                                            detailsOpen === task._id ? null : task._id
+                                        )
+                                    }
+                                >
+                                    {detailsOpen === task._id
+                                        ? "▲ Hide Details"
+                                        : "▼ Details"}
+                                </button>
+                            )}
+                        </div>
+
+                        {task.description && detailsOpen === task._id && (
+                            <div className="task-description">
+                                {task.description}
                             </div>
                         )}
                     </div>
