@@ -1,518 +1,490 @@
-# MERN Task Manager
+# Task Manager
 
-A full-stack Task Manager web application built using the **MERN stack**.
+# A full-stack Task Manager application built with the MERN stack. The application provides secure user authentication and allows users to create, manage, organize, search, filter, and sort their personal tasks.
 
-The application allows users to create, manage, update, complete, filter, and delete tasks. Tasks are stored persistently in MongoDB through a RESTful Express.js backend.
-
----
 
 ## Features
 
-- Create new tasks
-- Edit existing tasks
+### Authentication
+
+- User registration and login
+
+- Password hashing with bcrypt
+
+- JWT-based authentication
+
+- Protected task routes
+
+- User-specific task management
+
+### Task Management
+
+- Create tasks
+
+- Edit tasks
+
 - Delete tasks
+
 - Mark tasks as completed
-- Mark completed tasks as pending
-- Filter tasks by:
-  - All
-  - Pending
-  - Completed
-- Display total task count
-- Display completed task count
-- Display pending task count
-- Display the number of tasks in the current filter
-- Loading state while fetching tasks
-- Error messages for failed operations
-- Empty-state messages when no tasks are available
-- Delete confirmation before removing a task
-- Cancel editing functionality
-- Press `Enter` to add or update a task
-- Form validation
-- Backend validation
-- MongoDB database persistence
-- REST API
-- Responsive user interface
-- Git and GitHub version control
 
----
+- Clear all completed tasks
 
-## Technologies Used
+- Tasks are associated with the authenticated user
+
+### Task Organization
+
+- Low, Medium, and High priority levels
+
+- Due dates
+
+- Overdue task detection
+
+- Due Soon indicators
+
+- Task statistics
+
+- Filter tasks by status
+
+- Search tasks
+
+- Sort tasks
+
+### User Interface
+
+- Clean and minimal dashboard
+
+- Responsive design
+
+- Desktop and mobile layouts
+
+- Compact statistics
+
+- Clear task hierarchy
+
+- Priority badges
+
+- Due-date indicators
+
+- Responsive task controls
+
+## Tech Stack
 
 ### Frontend
 
 - React
+
 - Vite
+
 - Axios
+
 - JavaScript
+
 - CSS
 
 ### Backend
 
 - Node.js
+
 - Express.js
+
 - MongoDB
+
 - Mongoose
+
+- JSON Web Tokens (JWT)
+
+- bcryptjs
+
+- Express Validator
+
+- Helmet
+
 - CORS
+
 - dotenv
-
-### Development Tools
-
-- Visual Studio Code
-- Git
-- GitHub
-- MongoDB Atlas
-
----
-
-## Project Architecture
-
-The application follows a basic full-stack architecture:
-
-```text
-React Frontend
-      │
-      │ HTTP Requests using Axios
-      ▼
-Express.js REST API
-      │
-      │ Mongoose
-      ▼
-MongoDB Database
-```
-
----
 
 ## Project Structure
 
 ```text
+
 task-manager/
 │
 ├── backend/
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   ├── errorMiddleware.js
+│   │   └── validationMiddleware.js
 │   │
 │   ├── models/
-│   │   └── Task.js
+│   │   ├── Task.js
+│   │   └── User.js
 │   │
 │   ├── routes/
+│   │   ├── authRoutes.js
 │   │   └── taskRoutes.js
 │   │
 │   ├── package.json
-│   ├── package-lock.json
 │   └── server.js
 │
 ├── frontend/
-│   │
 │   ├── public/
-│   │
 │   ├── src/
-│   │   ├── assets/
-│   │   ├── App.css
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   │
 │   ├── package.json
-│   ├── package-lock.json
+│   ├── eslint.config.js
+│   ├── index.html
 │   └── vite.config.js
 │
 ├── .gitignore
 └── README.md
 ```
 
-> **Note:** The `backend/.env` file is intentionally not shown in the project structure because it contains sensitive configuration and should not be committed to GitHub.
 
----
 
-## Task Data Model
 
-Each task contains the following information:
-
-| Field | Type | Description |
-|---|---|---|
-| `_id` | ObjectId | Unique MongoDB identifier |
-| `title` | String | Task title |
-| `completed` | Boolean | Task completion status |
-| `createdAt` | Date | Task creation date and time |
-
-### Validation
-
-The task title:
-
-- Is required
-- Cannot be empty
-- Is automatically trimmed
-- Cannot be updated to an empty value
-
-The `completed` field defaults to `false`.
-
-The `createdAt` field is automatically generated when a task is created.
-
----
-
-# REST API
-
-## Base URL
-
-```text
-http://localhost:5000/api/tasks
-```
-
-## Get All Tasks
-
-### `GET /api/tasks`
-
-Returns all tasks stored in MongoDB.
-
-## Get One Task
-
-### `GET /api/tasks/:id`
-
-Returns a specific task using its MongoDB ID.
-
-## Create Task
-
-### `POST /api/tasks`
-
-Request body:
-
-```json
-{
-  "title": "Learn MERN Stack"
-}
-```
-
-## Update Task
-
-### `PUT /api/tasks/:id`
-
-Request body for editing a task:
-
-```json
-{
-  "title": "Learn MERN Stack"
-}
-```
-
-Request body for changing completion status:
-
-```json
-{
-  "title": "Learn MERN Stack",
-  "completed": true
-}
-```
-
-## Delete Task
-
-### `DELETE /api/tasks/:id`
-
-Deletes a task using its MongoDB ID.
-
----
-
-## API Endpoints Summary
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/tasks` | Get all tasks |
-| `GET` | `/api/tasks/:id` | Get one task |
-| `POST` | `/api/tasks` | Create a task |
-| `PUT` | `/api/tasks/:id` | Update a task |
-| `DELETE` | `/api/tasks/:id` | Delete a task |
-
----
-
-# How to Run the Project
 
 ## Prerequisites
 
-Make sure you have installed:
+
+
+Make sure the following are installed:
+
+
 
 - Node.js
 - npm
-- MongoDB / MongoDB Atlas
+- MongoDB database
 - Git
 
----
 
-## 1. Clone the Repository
+## Installation
 
-```bash
-git clone https://github.com/mdaimkhalid-cmd/mern-task-manager.git
-```
-
-Move into the project directory:
+### 1. Clone the repository
 
 ```bash
-cd mern-task-manager
+git clone <your-github-repository-url>
+cd task-manager
 ```
 
----
-
-## 2. Configure the Backend
-
-Move into the backend folder:
+### 2. Install backend dependencies
 
 ```bash
 cd backend
-```
-
-Install the backend dependencies:
-
-```bash
 npm install
 ```
 
----
+### 3. Install frontend dependencies
 
-## 3. Configure Environment Variables
-
-Create a `.env` file inside the `backend` folder.
-
-Add:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-```
-
-Replace `your_mongodb_connection_string` with your MongoDB connection string.
-
-Example:
-
-```env
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/taskmanager
-```
-
-> **Important:** Never commit your actual MongoDB connection string to GitHub.
-
----
-
-## 4. Start the Backend
-
-From the `backend` folder:
-
-```bash
-npm start
-```
-
-The backend will run on:
-
-```text
-http://localhost:5000
-```
-
----
-
-## 5. Start the Frontend
-
-Open another terminal.
-
-From the project root:
+Open another terminal:
 
 ```bash
 cd frontend
-```
-
-Install frontend dependencies:
-
-```bash
 npm install
 ```
 
-Start the React development server:
+Environment Variables
 
-```bash
-npm run dev
-```
 
-Vite will provide a local URL, normally similar to:
 
-```text
-http://localhost:5173
-```
+The application uses environment variables for configuration.
 
-Open that URL in your browser.
 
----
 
-# Running the Project
+Backend
 
-You need two terminals running at the same time.
 
-### Terminal 1 — Backend
-
-```bash
-cd backend
-npm start
-```
-
-### Terminal 2 — Frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-The frontend communicates with the backend through:
-
-```text
-http://localhost:5000/api/tasks
-```
-
----
-
-# Environment Variables
-
-The backend uses an environment variable for the MongoDB connection.
 
 Create:
 
-```text
+
+
 backend/.env
-```
+
+
+
+Add the required backend configuration:
+
+
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=your_backend_port
+
+Frontend
+
+
+
+Create:
+
+
+
+frontend/.env
+
+
 
 Add:
 
-```env
-MONGO_URI=your_mongodb_connection_string
-```
 
-The `.env` file should **not** be uploaded to GitHub.
 
----
+VITE_API_URL=your_backend_api_url
 
-# Error Handling
 
-The application handles errors for:
 
-- Failed task loading
-- Failed task creation
-- Failed task updates
-- Failed task deletion
-- Empty task titles
-- Invalid task updates
-- Task not found
-- MongoDB/API failures
+Do not commit .env files or expose database credentials, JWT secrets, or other sensitive values.
 
-The frontend displays appropriate error messages when API operations fail.
 
----
 
-# User Interface
+Running the Application
 
-The application includes:
+Start the Backend
 
-- Task Manager heading
-- Task statistics
-- Task filters
-- Task input field
-- Add Task button
-- Update Task button
-- Cancel button while editing
-- Task list
-- Completion checkbox
-- Edit button
-- Delete button
-- Delete confirmation
-- Loading message
-- Empty-state message
-- Responsive layout
 
----
 
-# Filtering
+From the backend directory:
 
-The application supports three task filters.
 
-### All
 
-Displays all tasks.
+node server.js
 
-### Pending
 
-Displays only tasks that have not been completed.
 
-### Completed
+The backend will start on the port configured in your environment variables.
 
-Displays only completed tasks.
 
-The selected filter is visually highlighted.
 
----
+Start the Frontend
 
-# Task Statistics
 
-The dashboard displays:
 
-- **Total**
-- **Completed**
-- **Pending**
+From the frontend directory:
 
-These values update automatically when tasks are added, edited, completed, or deleted.
 
----
 
-# Git and GitHub
+npm run dev
 
-The project uses Git for version control and GitHub for remote repository hosting.
 
-## Repository
 
-[GitHub Repository](https://github.com/mdaimkhalid-cmd/mern-task-manager)
+Vite will provide the local development URL in the terminal.
 
-## Check Git Status
 
-```bash
-git status
-```
 
-## Add Changes
+Available Frontend Commands
 
-```bash
-git add .
-```
 
-## Commit Changes
 
-```bash
-git commit -m "Your commit message"
-```
+From the frontend directory:
 
-## Push Changes
 
-```bash
-git push
-```
 
----
+npm run dev
 
-# Future Improvements
 
-Possible future improvements include:
 
-- User authentication
-- User registration and login
-- Multiple users
-- User-specific tasks
-- Task priorities
-- Task categories
-- Due dates
-- Search functionality
-- Sorting tasks
-- Dark mode
-- Pagination
-- Toast notifications
-- Deployment
-- Automated testing
-- API documentation
+Starts the development server.
 
----
 
-# Author
 
-**Muhammad Daim Khalid**
+npm run build
 
----
 
-# License
 
-This project was created as a learning and portfolio project.
+Creates a production build.
+
+
+
+npm run lint
+
+
+
+Runs ESLint checks.
+
+
+
+npm run preview
+
+
+
+Previews the production build locally.
+
+
+
+API Overview
+
+
+
+The backend provides API endpoints for authentication and task management.
+
+
+
+Authentication
+
+
+
+Typical authentication operations include:
+
+
+
+User registration
+
+User login
+
+JWT authentication
+
+Tasks
+
+
+
+Task operations include:
+
+
+
+Create a task
+
+Retrieve tasks
+
+Update a task
+
+Toggle task completion
+
+Delete a task
+
+Delete completed tasks
+
+
+
+Task data includes:
+
+
+
+Title
+
+Completion status
+
+Priority
+
+Due date
+
+User association
+
+Security
+
+
+
+The application includes several security-related mechanisms:
+
+
+
+Password hashing with bcryptjs
+
+JWT authentication
+
+Protected routes
+
+Request validation
+
+Helmet security middleware
+
+CORS configuration
+
+Environment variables for sensitive configuration
+
+User-specific database queries
+
+Responsive Design
+
+
+
+The dashboard is designed to work across different screen sizes.
+
+
+
+The interface adapts for:
+
+
+
+Desktop
+
+Tablet
+
+Mobile
+
+
+
+The mobile layout reorganizes the dashboard controls and statistics to prevent horizontal overflow and maintain usability.
+
+
+
+Future Improvements
+
+
+
+Potential improvements include:
+
+
+
+Loading states
+
+Improved error notifications
+
+Confirmation dialogs
+
+Drag-and-drop task organization
+
+Task categories
+
+Pagination
+
+Dark mode
+
+Task reminders
+
+Deployment
+
+Automated testing
+
+CI/CD integration
+
+Learning Goals
+
+
+
+This project was developed to practice and demonstrate:
+
+
+
+MERN stack development
+
+REST API development
+
+MongoDB database integration
+
+Authentication and authorization
+
+JWT-based security
+
+CRUD operations
+
+React component development
+
+API integration with Axios
+
+Form validation
+
+Responsive UI design
+
+Git and GitHub workflow
+
+Author
+
+
+
+Muhammad Daim Khalid
+
+
+
+BS Computer Science Graduate
+
+
+
+If you found this project useful, feel free to explore the repository and provide feedback.
+
+
