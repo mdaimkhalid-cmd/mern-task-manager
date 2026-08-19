@@ -15,10 +15,14 @@ function App() { const [token, setToken] = useState(
                             localStorage.getItem("isGuest") === "true"
                         );
                  const [taskTitle, setTaskTitle] = useState("");
+                 const [taskPriority, setTaskPriority] = useState("medium");
+                 const [taskDueDate, setTaskDueDate] = useState("");
                  const [tasks, setTasks] = useState([]);
                  const [editingTaskId, setEditingTaskId] = useState(null);
                  const [error, setError] = useState("");
                  const [filter, setFilter] = useState("all");
+                 const [sortBy, setSortBy] = useState("newest");
+                 const [searchTerm, setSearchTerm] = useState("");
                  const [loading, setLoading] = useState(true);
 
                  const API_URL = import.meta.env.VITE_API_URL;
@@ -90,15 +94,48 @@ function App() { const [token, setToken] = useState(
                 }, [token, isGuest]);
 
                 const filteredTasks = tasks.filter((task) => {
-                    if (filter === "completed") {
-                        return task.completed;
+                    const matchesFilter =
+                        filter === "all" ||
+                        (filter === "completed" && task.completed) ||
+                        (filter === "pending" && !task.completed);
+
+                    const matchesSearch = task.title
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase());
+
+                    return matchesFilter && matchesSearch;
+                });
+
+                const sortedTasks = [...filteredTasks].sort((a, b) => {
+                    if (sortBy === "newest") {
+                        return new Date(b.createdAt) - new Date(a.createdAt);
                     }
 
-                    if (filter === "pending") {
-                        return !task.completed;
+                    if (sortBy === "oldest") {
+                        return new Date(a.createdAt) - new Date(b.createdAt);
                     }
 
-                    return true;
+                    if (sortBy === "priority") {
+                        const priorityOrder = {
+                            high: 1,
+                            medium: 2,
+                            low: 3
+                        };
+
+                        return (
+                            (priorityOrder[a.priority || "medium"] || 2) -
+                            (priorityOrder[b.priority || "medium"] || 2)
+                        );
+                    }
+
+                    if (sortBy === "dueDate") {
+                        if (!a.dueDate) return 1;
+                        if (!b.dueDate) return -1;
+
+                        return new Date(a.dueDate) - new Date(b.dueDate);
+                    }
+
+                    return 0;
                 });
 
                   const handleAddTask = async () => {
@@ -114,6 +151,8 @@ function App() { const [token, setToken] = useState(
                         const newTask = {
                             _id: Date.now().toString(),
                             title: taskTitle.trim(),
+                            priority: taskPriority,
+                            dueDate: taskDueDate || null,
                             completed: false,
                             createdAt: new Date().toISOString()
                         };
@@ -127,6 +166,9 @@ function App() { const [token, setToken] = useState(
 
                         setTasks(updatedTasks);
                         setTaskTitle("");
+                        setTaskPriority("medium");
+                        setTaskDueDate("");
+                        setEditingTaskId(null);
 
                         return;
                     }
@@ -136,7 +178,9 @@ function App() { const [token, setToken] = useState(
                         const response = await axios.post(
                             API_URL,
                             {
-                                title: taskTitle
+                                title: taskTitle,
+                                priority: taskPriority,
+                                dueDate: taskDueDate || null
                             },
                             {
                                 headers: {
@@ -147,6 +191,8 @@ function App() { const [token, setToken] = useState(
 
                         setTasks([...tasks, response.data]);
                         setTaskTitle("");
+                        setTaskPriority("medium");
+                        setTaskDueDate("");
                     } catch (error) {
                         console.error("Failed to add task:", error);
                         setError(
@@ -193,6 +239,36 @@ function App() { const [token, setToken] = useState(
                         } catch (error) {
                             console.error("Failed to delete task:", error);
                             setError("Failed to delete task. Please try again.");
+                        }
+                    };
+                    const handleDeleteCompletedTasks = async () => {
+                        const completedTasks = tasks.filter((task) => task.completed);
+
+                        if (completedTasks.length === 0) {
+                            return;
+                        }
+
+                        if (!window.confirm("Are you sure you want to delete all completed tasks?")) {
+                            return;
+                        }
+
+                        try {
+                            if (isGuest) {
+                                const remainingTasks = tasks.filter((task) => !task.completed);
+                                setTasks(remainingTasks);
+                                return;
+                            }
+
+                            await axios.delete(`${API_URL}/completed/all`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            });
+
+                            setTasks(tasks.filter((task) => !task.completed));
+                        } catch (error) {
+                            console.error("Error deleting completed tasks:", error);
+                            setError("Failed to delete completed tasks.");
                         }
                     };
                   const handleToggleComplete = async (task) => {
@@ -245,9 +321,15 @@ function App() { const [token, setToken] = useState(
                         }
                     };
                   const handleEditTask = (task) => {
-                      setTaskTitle(task.title);
-                      setEditingTaskId(task._id);
-                  };
+                        setTaskTitle(task.title);
+                        setTaskPriority(task.priority || "medium");
+                        setTaskDueDate(
+                            task.dueDate
+                                ? new Date(task.dueDate).toISOString().split("T")[0]
+                                : ""
+                        );
+                        setEditingTaskId(task._id);
+                    };
                     const handleUpdateTask = async () => {
                         if (taskTitle.trim() === "") {
                             setError("Please enter a task.");
@@ -264,8 +346,10 @@ function App() { const [token, setToken] = useState(
                                 task._id === taskId
                                     ? {
                                         ...task,
-                                        title: taskTitle.trim()
-                                    }
+                                        title: taskTitle.trim(),
+                                        priority: taskPriority,
+                                        dueDate: taskDueDate || null
+                                      }
                                     : task
                             );
 
@@ -276,6 +360,7 @@ function App() { const [token, setToken] = useState(
 
                             setTasks(updatedTasks);
                             setTaskTitle("");
+                            setTaskDueDate("");
                             setEditingTaskId(null);
 
                             return;
@@ -286,7 +371,9 @@ function App() { const [token, setToken] = useState(
                             const response = await axios.put(
                                 `${API_URL}/${taskId}`,
                                 {
-                                    title: taskTitle
+                                    title: taskTitle,
+                                    priority: taskPriority,
+                                    dueDate: taskDueDate || null
                                 },
                                 {
                                     headers: {
@@ -303,6 +390,8 @@ function App() { const [token, setToken] = useState(
 
                             setTasks(updatedTasks);
                             setTaskTitle("");
+                            setTaskPriority("medium");
+                            setTaskDueDate("");
                             setEditingTaskId(null);
 
                         } catch (error) {
@@ -343,8 +432,55 @@ function App() { const [token, setToken] = useState(
               <span>
                   Pending: {tasks.filter((task) => !task.completed).length}
               </span>
-          </div>
+              <span>
+                    High: {tasks.filter((task) => (task.priority || "medium") === "high").length}
+                </span>
 
+                <span>
+                    Medium: {tasks.filter((task) => (task.priority || "medium") === "medium").length}
+                </span>
+
+                <span>
+                    Low: {tasks.filter((task) => (task.priority || "medium") === "low").length}
+                </span>
+          </div>
+          <button
+                className="clear-completed-button"
+                onClick={handleDeleteCompletedTasks}
+                disabled={!tasks.some((task) => task.completed)}
+            >
+                Clear Completed
+            </button>
+          <div className="search-box">
+            <button
+                className="search-icon-button"
+                onClick={() => {
+                    const searchInput = document.querySelector(".search-box input");
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                }}
+                aria-label="Search"
+            >
+                🔍
+            </button>
+
+            <input
+                type="text"
+                placeholder="Search tasks..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {searchTerm && (
+                <button
+                    className="clear-search-button"
+                    onClick={() => setSearchTerm("")}
+                >
+                    ×
+                </button>
+            )}
+        </div>
           <div className="filters">
             <button
                 className={filter === "all" ? "active-filter" : ""}
@@ -367,8 +503,36 @@ function App() { const [token, setToken] = useState(
                 Completed
             </button>
         </div>
+            <div className="sorting">
+                <label htmlFor="sortBy">Sort by:</label>
+
+                <select
+                    id="sortBy"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                >
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="priority">Priority</option>
+                    <option value="dueDate">Due Date</option>
+                </select>
+            </div>
 
             <div className="task-input">
+                <select
+                    value={taskPriority}
+                    onChange={(e) => setTaskPriority(e.target.value)}
+                >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <input
+                    type="date"
+                    value={taskDueDate}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setTaskDueDate(e.target.value)}
+                />
                 <input
                     type="text"
                     placeholder="Enter a task..."
@@ -428,7 +592,7 @@ function App() { const [token, setToken] = useState(
             {filter === "completed" && "No completed tasks."}
         </p>
     ) : (
-        filteredTasks.map((task) => (
+        sortedTasks.map((task) => (
             <div className="task" key={task._id}>
                 <div>
                     <input
@@ -436,10 +600,46 @@ function App() { const [token, setToken] = useState(
                         checked={task.completed}
                         onChange={() => handleToggleComplete(task)}
                     />
+                    <div>
+                        <div>
+                            <span className={task.completed ? "completed" : ""}>
+                                {task.title}
+                            </span>
 
-                    <span className={task.completed ? "completed" : ""}>
-                        {task.title}
-                    </span>
+                            <span className={`priority priority-${task.priority || "medium"}`}>
+                                {(task.priority || "medium").toUpperCase()}
+                            </span>
+                        </div>
+
+                        {task.dueDate && (
+                            <div
+                                className={
+                                    !task.completed &&
+                                    new Date(task.dueDate) < new Date()
+                                        ? "task-due-date overdue"
+                                        : "task-due-date"
+                                }
+                            >
+                                Due: {task.dueDate.split("T")[0]}
+
+                                {!task.completed &&
+                                    new Date(task.dueDate) < new Date() && (
+                                        <span className="overdue-label">
+                                            OVERDUE
+                                        </span>
+                                    )}
+
+                                {!task.completed &&
+                                    new Date(task.dueDate) >= new Date() &&
+                                    new Date(task.dueDate) <=
+                                        new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) && (
+                                        <span className="due-soon-label">
+                                            DUE SOON
+                                        </span>
+                                    )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div>
