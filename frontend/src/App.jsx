@@ -405,52 +405,24 @@ function App() { const [token, setToken] = useState(
     return (
     <div className="app">
 
-        <div className="user-header">
-            <div>
-                <h1>Task Manager</h1>
+            <div className="user-header">
+                <div className="header-left">
+                    <h1>Task Manager</h1>
 
-                {user && (
-                    <p className="welcome-message">
-                        Welcome, {user.name}
-                    </p>
-                )}
+                    {user && (
+                        <p className="welcome-message">
+                            Welcome, {user.name}
+                        </p>
+                    )}
+                </div>
+
+                <button
+                    className="logout-button"
+                    onClick={handleLogout}
+                >
+                    Logout
+                </button>
             </div>
-
-            <button
-                className="logout-button"
-                onClick={handleLogout}
-            >
-                Logout
-            </button>
-        </div>
-
-            <div className="task-stats">
-              <span>Total: {tasks.length}</span>
-              <span>
-                  Completed: {tasks.filter((task) => task.completed).length}
-              </span>
-              <span>
-                  Pending: {tasks.filter((task) => !task.completed).length}
-              </span>
-              <span>
-                    High: {tasks.filter((task) => (task.priority || "medium") === "high").length}
-                </span>
-
-                <span>
-                    Medium: {tasks.filter((task) => (task.priority || "medium") === "medium").length}
-                </span>
-
-                <span>
-                    Low: {tasks.filter((task) => (task.priority || "medium") === "low").length}
-                </span>
-          </div>
-          <button
-                className="clear-completed-button"
-                onClick={handleDeleteCompletedTasks}
-                disabled={!tasks.some((task) => task.completed)}
-            >
-                Clear Completed
-            </button>
           <div className="search-box">
             <button
                 className="search-icon-button"
@@ -565,7 +537,47 @@ function App() { const [token, setToken] = useState(
               >
                   Cancel
               </button>
-          )}
+            )}
+            </div>
+            <div className="task-stats">
+                <span>
+                    Total: {tasks.length}
+                </span>
+
+                <span>
+                    Completed: {tasks.filter((task) => task.completed).length}
+                </span>
+
+                <span>
+                    Pending: {tasks.filter((task) => !task.completed).length}
+                </span>
+
+                <span>
+                    High: {tasks.filter(
+                        (task) => (task.priority || "medium") === "high"
+                    ).length}
+                </span>
+
+                <span>
+                    Medium: {tasks.filter(
+                        (task) => (task.priority || "medium") === "medium"
+                    ).length}
+                </span>
+
+                <span>
+                    Low: {tasks.filter(
+                        (task) => (task.priority || "medium") === "low"
+                    ).length}
+                </span>
+            </div>
+            <div className="clear-completed-wrapper">
+                <button
+                    className="clear-completed-button"
+                    onClick={handleDeleteCompletedTasks}
+                    disabled={!tasks.some((task) => task.completed)}
+                >
+                    Clear Completed
+                </button>
             </div>
             {error && <p className="error">{error}</p>}
             <h2 className="task-list-title">
@@ -594,19 +606,22 @@ function App() { const [token, setToken] = useState(
     ) : (
         sortedTasks.map((task) => (
             <div className="task" key={task._id}>
-                <div>
+                <div className="task-main">
                     <input
                         type="checkbox"
                         checked={task.completed}
                         onChange={() => handleToggleComplete(task)}
                     />
-                    <div>
-                        <div>
+
+                    <div className="task-content">
+                        <div className="task-title-row">
                             <span className={task.completed ? "completed" : ""}>
                                 {task.title}
                             </span>
 
-                            <span className={`priority priority-${task.priority || "medium"}`}>
+                            <span
+                                className={`priority priority-${task.priority || "medium"}`}
+                            >
                                 {(task.priority || "medium").toUpperCase()}
                             </span>
                         </div>
@@ -632,7 +647,9 @@ function App() { const [token, setToken] = useState(
                                 {!task.completed &&
                                     new Date(task.dueDate) >= new Date() &&
                                     new Date(task.dueDate) <=
-                                        new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) && (
+                                        new Date(
+                                            Date.now() + 2 * 24 * 60 * 60 * 1000
+                                        ) && (
                                         <span className="due-soon-label">
                                             DUE SOON
                                         </span>
@@ -642,7 +659,7 @@ function App() { const [token, setToken] = useState(
                     </div>
                 </div>
 
-                <div>
+                <div className="task-actions">
                     <button
                         className="edit-button"
                         onClick={() => handleEditTask(task)}
