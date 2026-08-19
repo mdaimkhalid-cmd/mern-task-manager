@@ -74,80 +74,80 @@ body {
 
 .user-header {
     position: relative;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin-bottom: 35px;
-    min-height: 90px;
+    align-items: flex-start;
+    margin-bottom: 24px;
 }
 
+/* Title + welcome message */
 .header-left {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    text-align: center;
+    align-items: flex-start;
+    width: max-content;
 }
 
-.header-right {
+.header-left h1 {
+    margin: 0;
+    padding: 0;
+
+    text-align: left;
+
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1;
+    font-weight: 750;
+    letter-spacing: -1px;
+
+    color: var(--brown-dark);
+
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+
+    animation: titleEnter 0.6s ease-out;
+}
+
+/* Welcome badge */
+.welcome-message {
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 8px;
+
+    margin: 8px 0 0 0;
+    padding: 8px 12px;
+
+    width: max-content;
+    box-sizing: border-box;
+
+    border-radius: 7px;
+    background: transparent;
+    border: 1px solid #e2d2bf;
+
+    color: var(--text-medium);
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    text-align: left;
+}
+
+.welcome-message svg {
+    color: var(--brown);
     flex-shrink: 0;
 }
 
+/* Keep logout on the right */
 .user-header .logout-button {
     position: absolute;
     right: 0;
     top: 0;
 }
-
-/* Left side of header */
-
-.user-header > div:first-child {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-
-/* Main title */
-
-.user-header h1 {
-    margin: 0;
-    padding: 0;
-    text-align: left;
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    line-height: 1;
-    font-weight: 750;
-    letter-spacing: -1px;
-    color: var(--brown-dark);
-    background: none;
-    -webkit-background-clip: initial;
-    background-clip: initial;
-    -webkit-text-fill-color: initial;
-    animation: titleEnter 0.6s ease-out;
-}
-
-
-/* Welcome badge */
-
-.welcome-message {
-    display: inline-block;
-    margin: 0;
-    padding: 5px 11px;
-    border-radius: 7px;
-    background: transparent;
-    border: 1px solid #e2d2bf;
-    color: var(--text-medium);
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.4;
-    text-align: center;
-}
-
 
 /* =========================================================
    LOGOUT
@@ -188,8 +188,8 @@ body {
    ========================================================= */
 
 .task-stats {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    display: flex;
+    flex-wrap: nowrap;
     gap: 8px;
     width: 100%;
     margin: 0 0 24px;
@@ -200,9 +200,13 @@ body {
     padding: 8px 10px;
     box-sizing: border-box;
 
+    flex: 1;
+    min-width: 0;
+
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 7px;
 
     background: var(--cream-card);
     border: 1px solid var(--border);
@@ -217,6 +221,27 @@ body {
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease;
+}
+
+.task-stats span svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Total */
+.task-stats span:nth-child(1) svg {
+    color: #805333;
+}
+
+/* Completed */
+.task-stats span:nth-child(2) svg {
+    color: #4f7955;
+}
+
+/* Pending */
+.task-stats span:nth-child(3) svg {
+    color: #9a6a24;
 }
 
 .task-stats span:hover {

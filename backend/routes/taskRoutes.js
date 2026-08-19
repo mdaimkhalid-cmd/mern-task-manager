@@ -172,9 +172,6 @@ router.put(
                     ...(req.body.description !== undefined && {
                         description: req.body.description
                     }),
-                    ...(req.body.description !== undefined && {
-                        description: req.body.description
-                    }),
                     ...(req.body.completed !== undefined && {
                         completed: req.body.completed
                     }),

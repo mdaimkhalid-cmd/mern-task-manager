@@ -2,6 +2,17 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import Auth from "./Auth";
+import {
+    User,
+    ListTodo,
+    CircleCheck,
+    Hourglass,
+    Check,
+    Trash2,
+    Pencil,
+    ChevronDown,
+    ChevronUp
+} from "lucide-react";
 
 function App() { const [token, setToken] = useState(
                             localStorage.getItem("token")
@@ -432,9 +443,10 @@ function App() { const [token, setToken] = useState(
                     <h1>Task Manager</h1>
 
                     {user && (
-                        <p className="welcome-message">
-                            Welcome, {user.name}
-                        </p>
+                        <div className="welcome-message">
+                            <User size={28} strokeWidth={2} />
+                            <span>Welcome, {user.name}</span>
+                        </div>
                     )}
                 </div>
 
@@ -579,14 +591,17 @@ function App() { const [token, setToken] = useState(
             </div>
             <div className="task-stats">
                 <span>
+                    <ListTodo size={20} strokeWidth={2} />
                     Total: {tasks.length}
                 </span>
 
                 <span>
+                    <CircleCheck size={20} strokeWidth={2} />
                     Completed: {tasks.filter((task) => task.completed).length}
                 </span>
 
                 <span>
+                    <Hourglass size={20} strokeWidth={2} />
                     Pending: {tasks.filter((task) => !task.completed).length}
                 </span>
 
@@ -607,6 +622,7 @@ function App() { const [token, setToken] = useState(
                         (task) => (task.priority || "medium") === "low"
                     ).length}
                 </span>
+
             </div>
             <div className="clear-completed-wrapper">
                 <button
